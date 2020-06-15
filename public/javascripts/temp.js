@@ -80,105 +80,155 @@ if (document.location.search.match(/type=embed/gi)) {
 }
 function dfs(url,bool_flag) 
 {
+  console.log(url)
   var xhttp = new XMLHttpRequest()
   xhttp.onreadystatechange = function () 
   {
     if(this.readyState == 4 && this.status == 200)
     {
-      var result = []; 
-      result = JSON.parse(this.responseText).message;
-      var end = JSON.parse(this.responseText).end;
-      var i;
-      for(i=0;i<result.length;i++)
+      if(JSON.parse(this.responseText).message)
       {
-        queue.push(result[i]);
-      }
-      if(bool_flag)
-      {
+        var result = []; 
+        result = JSON.parse(this.responseText).message;
+        var end = JSON.parse(this.responseText).end;
         var i;
-      if(result.length >= 1)
-      {
-        if(url.includes(".java")) 
-        java_indices.push(count)
-        else if(url.includes(".py")) 
-        python_indices.push(count)
-        else if(url.includes(".cpp")) 
-        cpp_indices.push(count)
-        document.getElementById("code").innerHTML += "https://github.com/" + url + "\n" ; 
-      }
-      for(i=0;i<result.length;i++)
-      {
-        document.getElementById("code").innerHTML += result[i] + "\n" ;
-      }
+        for(i=0;i<result.length;i++)
+        {
+          queue.push(result[i]);
+        }
+        if(bool_flag)
+        {
+          var i;
         if(result.length >= 1)
         {
-          document.getElementById("code").innerHTML +=  "<br/>--------------------<br/>";
-          count = count  + 1
-          check_flag = true
-          document.getElementById('file_desc').innerHTML = 'Number of files being Analyzed: '
-          document.getElementById('file_count').innerHTML = count  + "/" + pre_count;
-          if(pre_count == count)
+          if(url.includes(".java"))
           {
-            document.getElementById('progress_bar').style.display = 'none'
-            document.getElementById('complete').style.display = 'block'
-            analyze(document.getElementById("code").innerHTML.split('--------------------'))
+            java_indices.push(count)
+            document.getElementById("code").innerHTML += "https://github.com/" + url + "\n" ;
+          } 
+          else if(url.includes(".py")) 
+          { 
+            python_indices.push(count)
+            document.getElementById("code").innerHTML += "https://github.com/" + url + "\n" ;
+          } 
+          else if(url.includes(".cpp"))
+          {
+            cpp_indices.push(count)
+            document.getElementById("code").innerHTML += "https://github.com/" + url + "\n" ;
+          } 
+          
+          
+        }
+        if(url.includes('.java') || url.includes('.cpp') || url.includes('.py'))
+        {
+          for(i=0;i<result.length;i++)
+          {
+            document.getElementById("code").innerHTML += result[i] + "\n" ;
           }
         }
-      }
-      else
-      {
-      for(i=0;i<result.length;i++)
-      {
-         if(result[i].includes("."))
-         {
-            if(url.includes("master"))
+          if(result.length >= 1)
+          {
+            if(url.includes('.java') || url.includes('.cpp') || url.includes('.py'))
             {
-            if(result[i].includes(".java") || result[i].includes(".cpp") || result[i].includes(".py"))
+            document.getElementById("code").innerHTML +=  "<br/>--------------------<br/>";
+            count = count  + 1
+            check_flag = true
+            document.getElementById('file_desc').innerHTML = 'Number of files being Analyzed: '
+            document.getElementById('file_count').innerHTML = count  + "/" + pre_count;
+            if(pre_count == count)
             {
-              pre_count = pre_count + 1;
-              dfs(url + "/" + result[i],true)
-            } 
-            else if(result[i].includes(".h"))
-              cpp_modules.push(result[i])
-          }
-            else
-            {
-              if(result[i].includes(".java") || result[i].includes(".cpp") || result[i].includes(".py"))
-              {
-                pre_count = pre_count + 1;
-                dfs(url + "/blob/master/" + result[i],true)
-              }
-              else if(result[i].includes(".h"))
-              cpp_modules.push(result[i])
+              document.getElementById('progress_bar').style.display = 'none'
+              document.getElementById('complete').style.display = 'block'
+              analyze(document.getElementById("code").innerHTML.split('--------------------'))
+              //metaf1()
+            }
             }
             
-         }
-         else
-         {
-          if(url.includes("master"))
-          {
-            if(end == "true")
+          }
+          // if(pre_count == 0 &&  count == 0)
+          // {
+          //   document.getElementById('progress_bar').style.display = 'none'
+          //   document.getElementById('complete').style.display = 'block'
+          //   analyze(document.getElementById("code").innerHTML.split('--------------------'))
+          //   //metaf1()
+          // }
+        }
+        else
+        {
+        for(i=0;i<result.length;i++)
+        {
+           if(result[i].includes("."))
+           {
+              if(url.includes("master"))
+              {
+              if(result[i].includes(".java") || result[i].includes(".cpp") || result[i].includes(".py"))
+              {
+                pre_count = pre_count + 1;    
+              } 
+              else if(result[i].includes(".h"))
+              {
+                cpp_modules.push(result[i])
+              }
+              dfs(url + "/" + result[i],true)
+            }
+              else
+              {
+                if(result[i].includes(".java") || result[i].includes(".cpp") || result[i].includes(".py"))
+                {
+                  pre_count = pre_count + 1;
+                }
+                else if(result[i].includes(".h"))
+                {
+                  cpp_modules.push(result[i])
+                }
+                dfs(url + "/blob/master/" + result[i],true)
+              }
+              
+           }
+           else
+           {
+            if(url.includes("master"))
             {
-              dfs(url + "/" + result[i],false);
+              if(end == "true")
+              {
+                dfs(url + "/" + result[i],false);
+              }
+              else
+              {
+                dfs(url + "/" + result[i],true);
+              }
             }
             else
             {
-              dfs(url + "/" + result[i],true);
+              if(end == "true")
+              {
+                dfs(url + "/tree/master/" + result[i],false)
+              }
+              else
+              {
+                dfs(url + "/tree/master/" + result[i],true); 
+              }     
             }
-          }
-          else
-          {
-            if(end == "true")
-            {
-              dfs(url + "/tree/master/" + result[i],false)
-            }
-            else
-            {
-              dfs(url + "/tree/master/" + result[i],true); 
-            }     
-          }
-         }
+           }
+        }
+        // if(pre_count == 0 &&  count == 0)
+        // {
+        //   document.getElementById('progress_bar').style.display = 'none'
+        //   document.getElementById('complete').style.display = 'block'
+        //   analyze(document.getElementById("code").innerHTML.split('--------------------'))
+        //   //metaf1()
+        // }
+        }
       }
+      else 
+      {
+        // if(pre_count == 0 &&  count == 0)
+        //   {
+        //     document.getElementById('progress_bar').style.display = 'none'
+        //     document.getElementById('complete').style.display = 'block'
+        //     analyze(document.getElementById("code").innerHTML.split('--------------------'))
+        //     //metaf1()
+        //   }
       }
     }      
   }
@@ -437,12 +487,84 @@ function analyze(arr)
     document.getElementById('d_cpp').innerHTML += "<br>-------<br>";
   }
 }
+// function metaf1() 
+// {
+//   var xhttp = new XMLHttpRequest()
+//   xhttp.onreadystatechange = function () 
+//   {
+//     if(this.readyState == 4 && this.status == 200)
+//     {
+//      // console.log(this.responseText)
+//       document.getElementById('metadata').style.display = 'block'
+//       document.getElementById('stargazers_count').innerHTML = JSON.parse(this.responseText).stargazers_count;
+//       document.getElementById('forks_count').innerHTML = JSON.parse(this.responseText).forks_count;
+//       document.getElementById('open_issues_count').innerHTML = JSON.parse(this.responseText).open_issues_count;
+//       metaf2()
+//     }      
+//   }
+//   xhttp.open("GET","https://api.github.com/repos/"+document.getElementById('link').value,true)
+//   xhttp.send() 
+
+// }
+// function metaf2() 
+// {
+//   var xhttp = new XMLHttpRequest()
+//   xhttp.onreadystatechange = function () 
+//   {
+//     if(this.readyState == 4 && this.status == 200)
+//     {
+//     //  console.log(this.responseText)
+//       if(this.responseText.network_count)
+//       {
+//         // do nothing
+//       }
+//       else 
+//       {
+//         document.getElementById('closed_issues_count').innerHTML = JSON.parse(this.responseText).length;
+//       }
+//       metaf3()
+//     }      
+//   }
+//   xhttp.open("GET","https://api.github.com/repos/"+document.getElementById('link').value+"/issues?state=closed",true)
+//   xhttp.send()
+// }
+// function metaf3() 
+// {
+//   var xhttp = new XMLHttpRequest()
+//   xhttp.onreadystatechange = function () 
+//   {
+//     if(this.readyState == 4 && this.status == 200)
+//     {
+//       console.log(JSON.parse(this.responseText))
+//       metaf4()
+//     }      
+//   }
+//   xhttp.open("GET","https://api.github.com/repos/"+document.getElementById('link').value+"/pulls",true)
+//   xhttp.send()
+// }
+// function metaf4() 
+// {
+//   var xhttp = new XMLHttpRequest()
+//   xhttp.onreadystatechange = function () 
+//   {
+//     if(this.readyState == 4 && this.status == 200)
+//     {
+//       console.log(JSON.parse(this.responseText))
+//        // document.getElementById('closed_issues_count').innerHTML = JSON.parse(this.responseText)[0].number;
+      
+//    //  metaf4()
+//     }      
+//   }
+//   xhttp.open("GET","https://api.github.com/repos/"+document.getElementById('link').value+"/commits",true)
+//   xhttp.send()
+// }
 function analysis() 
 { 
-    document.getElementById('progress_bar').style.display = 'block' 
-    document.getElementById('file_display').style.display = 'block'
+   document.getElementById('progress_bar').style.display = 'block' 
+   document.getElementById('file_display').style.display = 'block'
     setTimeout(() => {
       console.log(document.getElementById('link').value)
       dfs(document.getElementById('link').value,false)  
-    }, 2000);    
+      //metaf1()
+    }, 100);    
 }

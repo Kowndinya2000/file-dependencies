@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="demo">
+<h1>The XMLHttpRequest Object</h1>
+<table  border="1" style="width: 100%;border: 2px solid blue">
+  <tbody id="mdata">
+       <tr>
+      <th>S1</th>     
+  </tr>
+  </tbody>
+</div>
+
+<script>
+function metaf3(url) 
+{
+  var xhttp = new XMLHttpRequest()
+  xhttp.onreadystatechange = function () 
+  {
+    if(this.readyState == 4 && this.status == 200)
+    {
+      var result = JSON.parse(this.responseText);
+      cod += '<td>'
+      for(var i=0;i<result.length-1;i++)
+      {
+          console.log(result[i])
+          cod += result[i].commit.author.date + "," 
+      }
+
+      cod += result[result.length-1].commit.author.date + '</td></tr>'
+      document.getElementById('mdata').innerHTML += cod
+    }      
+  }
+  xhttp.open("GET","https://api.github.com/repos/"+url+"/commits",false)
+  xhttp.send()
+}
+    setTimeout(() => {
+        var list = ['chocoluffy/Berkeley-CS61A']
+      //var list = ['PragmaticIT/xiconify', 'PacktPublishing/C-8-and-.NET-Core-3-Projects-Using-Azure-Second-Edition', 'dotnetcore/WebApiClient', 'winnster/DotRas', 'getgauge-examples/gauge-example-csharp', 'royosherove/dotnet-perfplus', 'sschmid/EntitasPure', 'trashvin/Tutorial_UsingStateless', 'CypherCore/CypherCore', 'cs-util-com/cscore', 'lxconan/clrViaTest', 'zeros-team/Projects', 'LaunchCodeLiftoffProjects/Late_Night_Snacks', 'anton-bot/Full-Emoji-List', 'pandaedward/refaction', 'kwwwvagaa/NetWinformControl', 'curiosity-inc/azure-kinect-dk-unity', 'A9T9/Free-OCR-API-CSharp', 'mbdavid/FileDB', 'Patagames/Pdf.WinForms', 'spatialos/CsharpBlankProject', 'JackWangCUMT/NetGanttControl', 'OpenEpl/EProjectFile', 'JesseKPhillips/CsharpActiveX', 'SohaibAjmal/DataMining-Project-CSharp', 'ishani/ClangVSx', 'iQuarc/Geco', 'sarn1/example-aspnet-mvc', 'OlgaRacu/TeamProject-POS-PointOfSales', 'zyrif/Project-JobBoard', 'sjdirect/abotx', 'ArturT/Game-of-Life', 'Hitman666/nbCcTalkCoinAcceptor', 'Equipple/vs-templates-revit-addin', 'olegil/SqlBulkTools', 'Travelport/travelport-uapi-tutorial-c-sharp', 'MarkPThomas/HeadFirst-CSharp', 'uow-dmurrell/ProjectorControl', 'TanvirArjel/CustomValidation']
+        for(var i=0;i<list.length;i++)
+        {
+            cod = ""
+            metaf3(list[i])
+        }
+      
+    }, 100); 
+</script>
+
+</body>
+</html>

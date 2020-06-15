@@ -13,7 +13,13 @@ app.use(cors({
 }))
 var indexRouter = require('./routes/index');
 var analysisRouter = require('./routes/analysis')
-
+var analysisRouter2 = require('./routes/analysis2')
+var analysisRouter3 = require('./routes/analysis3')
+var analysisRouter4 = require('./routes/analysis4')
+var analysisRouter5 = require('./routes/analysis5')
+var analysisRouter6 = require('./routes/analysis6')
+var analysisRouter7 = require('./routes/analysis7')
+var metaRouter = require('./routes/meta')
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
@@ -22,9 +28,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", '*');
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,**Authorization**');
+  next();
+  })
 app.use('/', indexRouter);
+app.use('/meta',metaRouter)
 app.use('/analysis', analysisRouter);
+app.use('/analysis2', analysisRouter2);
+app.use('/analysis3', analysisRouter3);
+app.use('/analysis4', analysisRouter4);
+app.use('/analysis5', analysisRouter5);
+app.use('/analysis6', analysisRouter6);
+app.use('/analysis7', analysisRouter7);
 
 app.use(function(req, res, next) {
   next(createError(404));
